@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  ssh-server-1:
+    image: alpine
+    container_name: ssh-svr
+    command: sh -c "apk update && apk add --no-cache openssh nano ufw openrc && ssh-keygen -A && adduser -D newuser && echo 'newuser:${PASSWORD}' | chpasswd && /usr/sbin/sshd -D"
+    ports:
+      - "2222:22"
+      - "8000:8000"
+    volumes:
+      - "./ssh-server/ssh:/etc/ssh"
+      - "./django-app:/app"
+    environment:
+      - PASSWORD=${PASSWORD}
+    env_file:
+      - .env
+
+  ssh-server-2:
+    image: alpine
+    container_name: ssh-clt
+    command: sh -c "apk update && apk add --no-cache openssh nano ufw openrc && ssh-keygen -A && /usr/sbin/sshd -D"
+    ports:
+      - "2223:22"
+    volumes:
+      - "./ssh-client/ssh:/etc/ssh"
